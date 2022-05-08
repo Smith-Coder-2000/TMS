@@ -1,6 +1,7 @@
 {
   "name": "tms",
   "version": "1.0.0",
+  "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -15,15 +16,5 @@
     "nodemon": "^2.0.12",
     "password-validator": "^5.2.1",
     "path": "^0.12.7"
-  },
-  "devDependencies": {},
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Smith-Coder-2000/TMS.git"
-  },
-  "bugs": {
-    "url": "https://github.com/Smith-Coder-2000/TMS/issues"
-  },
-  "homepage": "https://github.com/Smith-Coder-2000/TMS#readme",
-  "description": ""
+  }
 }

@@ -13,6 +13,7 @@ app.use("/assets", express.static(path.join(__dirname, 'assets')));
 var date_obj = new Date();
 //Checking the crypto module
 const crypto = require('crypto');
+const { time } = require('console');
 const algorithm = 'aes-256-cbc'; //Using AES encryption
 const key = crypto.randomBytes(32);
 const iv = crypto.randomBytes(16);
@@ -51,9 +52,9 @@ schema
 function getTime(){
   var hours = date_obj.getHours();
   var minutes = date_obj.getMinutes();
-  var time = String(hours)+String(minutes);
-  console.log(time);
-  return parseInt(time)
+  var seconds = date_obj.getSeconds();
+  var time =hours + ":" + minutes + ":" + seconds;
+  return time
 }
 
 
@@ -140,13 +141,16 @@ app.get('/addMovie',(req,res)=>{
 
 app.get('/movie/:index',(req,res) => {
   var index= req.params["index"];
-  connection.query(`SELECT * FROM shows where movie_id=${index} and start_time>=${getTime()} and date=CURDATE()`,(err,rows,fields)=>{
+  console.log(getTime())
+  tim=getTime()
+  connection.query(`SELECT * FROM shows where movie_id=${index} and start_time>=CURTIME() and date=CURDATE()`,(err,rows,fields)=>{
     connection.query(`SELECT * FROM shows where movie_id=${index} and date>CURDATE()`,(err,row,fields)=>{
     if (err) {
       console.log("File read failed:", err);
       return;
     }
     try{
+        console.log(row)
         console.log(rows)
         res.json({rows,row})
         
@@ -160,6 +164,13 @@ app.get('/movie/:index',(req,res) => {
 
 app.get('/movie/show/:index',(req,res)=>{
   var index= req.params["index"];
+  connection.query(`SELECT screen_id from shows where show_id=${index}`,function(err,rows){
+    if (err) throw err
+    connection.query(`SELECT * from seats where screen_id=${rows[0].screen_id}`,function(err,row){
+      if (err) throw err
+      res.json({row,index,rows})
+    })
+  })
 })
  
 app.listen(port, () => {
