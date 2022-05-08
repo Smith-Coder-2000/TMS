@@ -49,13 +49,6 @@ schema
 .has().not().spaces()                           
 .is().not().oneOf(['Passw0rd', 'Password123']);
 
-function getTime(){
-  var hours = date_obj.getHours();
-  var minutes = date_obj.getMinutes();
-  var seconds = date_obj.getSeconds();
-  var time =hours + ":" + minutes + ":" + seconds;
-  return time
-}
 
 
 var connection = mysql.createConnection({
@@ -141,8 +134,6 @@ app.get('/addMovie',(req,res)=>{
 
 app.get('/movie/:index',(req,res) => {
   var index= req.params["index"];
-  console.log(getTime())
-  tim=getTime()
   connection.query(`SELECT * FROM shows where movie_id=${index} and start_time>=CURTIME() and date=CURDATE()`,(err,rows,fields)=>{
     connection.query(`SELECT * FROM shows where movie_id=${index} and date>CURDATE()`,(err,row,fields)=>{
     if (err) {
