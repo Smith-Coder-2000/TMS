@@ -143,7 +143,7 @@ app.get('/movie/:index',(req,res) => {
     try{
         console.log(row)
         console.log(rows)
-        res.json({rows,row})
+        res.json({rows:[{...rows},{...row}]})
         
     }catch (err) {
         console.log('error parsing JSON',err)
