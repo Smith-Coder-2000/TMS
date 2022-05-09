@@ -67,8 +67,10 @@ connection.connect(function(err){
   })
 
 app.get('/',(req,res)=>{
+  
     res.send("hello");
  })
+  
 
 app.post('/register',(req,res)=>{
   var name=req.body.cust_name;  
@@ -76,6 +78,7 @@ app.post('/register',(req,res)=>{
   var email=req.body.email;
   var password=req.body.password;
   var count=0;
+ 
   if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email.value))
   {
     if(schema.validate(password.value)){
@@ -161,14 +164,12 @@ app.get('/movie/show/:index',(req,res)=>{
 app.post('/login',(req,res)=>{
   var id=req.body.id;
   var password=req.body.password;
-  console.log(id)
-  console.log(password)
   var count=0;
   connection.query('SELECT * from customer',function(err,rows){
     if (err) throw err
     for(var i=0;i<rows.length;i++)
     {
-      if(rows[i].cust_id==id.value&&rows[i].password==encrypt(password.value)){
+      if(rows[i].cust_id==id.value&&decrypt(rows[i].password)==password.value){
         count=1;
         break
       }
