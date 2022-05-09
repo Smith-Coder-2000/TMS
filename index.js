@@ -170,11 +170,11 @@ app.post('/login',(req,res)=>{
   console.log(id)
   console.log(password)
   var count=0;
-  connection.query('SELECT * from credential',function(err,rows){
+  connection.query('SELECT * from customer',function(err,rows){
     if (err) throw err
     for(var i=0;i<rows.length;i++)
     {
-      if(rows[i].user_id==id.value&&rows[i].passwd==password.value){
+      if(rows[i].cust_id==id.value&&rows[i].password==password.value){
         count=1;
         break
       }
