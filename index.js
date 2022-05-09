@@ -92,14 +92,8 @@ app.post('/register',(req,res)=>{
           res.send("Email id already registered");
         }
         else{
-          connection.query(`INSERT INTO customer VALUES (null,${name.value},0,${phn.value},${email.value})`,function(err){
+          connection.query(`INSERT INTO customer VALUES (null,${name.value},0,${phn.value},${email.value},${encrypt(password.value)})`,function(err){
             if (err) throw err
-            connection.query(`SELECT cust_id WHERE email=${email}`,function(err,id){
-              if (err) throw err
-              connection.query(`INSERT INTO credential  VALUES (${id[0].cust_id},${encrypt(password.value)})`,function(err){
-                if (err) throw err
-              })
-            })
           }) 
         }
       }
@@ -143,7 +137,7 @@ app.get('/movie/:index',(req,res) => {
     try{
         console.log(row)
         console.log(rows)
-        res.json({rows:[{...rows},{...row}]})
+        res.json({rows,row})
         
     }catch (err) {
         console.log('error parsing JSON',err)
@@ -174,13 +168,13 @@ app.post('/login',(req,res)=>{
     if (err) throw err
     for(var i=0;i<rows.length;i++)
     {
-      if(rows[i].cust_id==id.value&&rows[i].password==password.value){
+      if(rows[i].cust_id==id.value&&rows[i].password==encrypt(password.value)){
         count=1;
         break
       }
     }
     if(count==1){
-      res.sendStatus(201,"success");
+      res.json(encrypt(password.value));
     }
     else{
       res.sendStatus(401,"unauthorized")
