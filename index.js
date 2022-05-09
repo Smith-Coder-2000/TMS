@@ -163,6 +163,30 @@ app.get('/movie/show/:index',(req,res)=>{
     })
   })
 })
+
+app.post('/login',(req,res)=>{
+  var id=req.body.id;
+  var password=req.body.password;
+  console.log(id)
+  console.log(password)
+  var count=0;
+  connection.query('SELECT * from credential',function(err,rows){
+    if (err) throw err
+    for(var i=0;i<rows.length;i++)
+    {
+      if(rows[i].user_id==id.value&&rows[i].passwd==password.value){
+        count=1;
+        break
+      }
+    }
+    if(count==1){
+      res.sendStatus(201,"success");
+    }
+    else{
+      res.sendStatus(401,"unauthorized")
+    }
+  })
+})
  
 app.listen(port, () => {
     console.log(`Example app listening at http://localhost:${port}`)
