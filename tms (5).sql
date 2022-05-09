@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3307
--- Generation Time: May 08, 2022 at 05:14 PM
+-- Generation Time: May 09, 2022 at 10:20 AM
 -- Server version: 10.4.14-MariaDB
 -- PHP Version: 7.2.34
 
@@ -28,22 +28,12 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `admin` (
-  `admin_id` int(5) NOT NULL,
+  `admin_id` int(10) NOT NULL,
   `admin_name` varchar(25) NOT NULL,
   `email` varchar(25) NOT NULL,
   `role` varchar(25) NOT NULL,
-  `phone_number` int(12) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `credential`
---
-
-CREATE TABLE `credential` (
-  `user_id` int(5) NOT NULL,
-  `passwd` varchar(10) NOT NULL
+  `phone_number` int(12) NOT NULL,
+  `password` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
@@ -57,19 +47,20 @@ CREATE TABLE `customer` (
   `cust_name` varchar(25) NOT NULL,
   `cust_age` int(2) NOT NULL,
   `phone_number` int(12) NOT NULL,
-  `email` varchar(25) NOT NULL
+  `email` varchar(25) NOT NULL,
+  `password` varchar(20) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `customer`
 --
 
-INSERT INTO `customer` (`cust_id`, `cust_name`, `cust_age`, `phone_number`, `email`) VALUES
-(1000, 'Ashwin', 22, 2147483647, 'ashwinkumar@gmail.com'),
-(1001, 'Amber', 23, 2147483647, 'amberlinda@gmail.com'),
-(1002, 'Rapunzel', 20, 2147483647, 'rapunzel12@gmail.com'),
-(1003, 'Vikash', 24, 2147483647, 'vikashkumar@gmail.com'),
-(1004, 'Smith', 21, 2147483647, 'smithcdgmail.com');
+INSERT INTO `customer` (`cust_id`, `cust_name`, `cust_age`, `phone_number`, `email`, `password`) VALUES
+(1000, 'Ashwin', 22, 2147483647, 'ashwinkumar@gmail.com', 'ashwin@A123'),
+(1001, 'Amber', 23, 2147483647, 'amberlinda@gmail.com', ''),
+(1002, 'Rapunzel', 20, 2147483647, 'rapunzel12@gmail.com', ''),
+(1003, 'Vikash', 24, 2147483647, 'vikashkumar@gmail.com', ''),
+(1004, 'Smith', 21, 2147483647, 'smithcdgmail.com', '');
 
 -- --------------------------------------------------------
 
@@ -430,12 +421,6 @@ ALTER TABLE `admin`
   ADD PRIMARY KEY (`admin_id`);
 
 --
--- Indexes for table `credential`
---
-ALTER TABLE `credential`
-  ADD PRIMARY KEY (`user_id`);
-
---
 -- Indexes for table `customer`
 --
 ALTER TABLE `customer`
@@ -506,7 +491,7 @@ ALTER TABLE `transaction`
 -- AUTO_INCREMENT for table `admin`
 --
 ALTER TABLE `admin`
-  MODIFY `admin_id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=100;
+  MODIFY `admin_id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=100;
 
 --
 -- AUTO_INCREMENT for table `customer`
@@ -529,13 +514,6 @@ ALTER TABLE `shows`
 --
 -- Constraints for dumped tables
 --
-
---
--- Constraints for table `credential`
---
-ALTER TABLE `credential`
-  ADD CONSTRAINT `credential_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `customer` (`cust_id`),
-  ADD CONSTRAINT `credential_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `admin` (`admin_id`);
 
 --
 -- Constraints for table `offers`
