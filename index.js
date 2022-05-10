@@ -14,9 +14,14 @@ var date_obj = new Date();
 //Checking the crypto module
 const crypto = require('crypto');
 const { time } = require('console');
+const { type } = require('os');
+
 const algorithm = 'aes-256-cbc'; //Using AES encryption
 const key = crypto.randomBytes(32);
 const iv = crypto.randomBytes(16);
+
+app.use(express.json());
+app.use(express.urlencoded());
 
 //Encrypting text
 function encrypt(text) {
@@ -26,15 +31,19 @@ function encrypt(text) {
    return { iv: iv.toString('hex'), encryptedData: encrypted.toString('hex') };
 }
 
+
 // Decrypting text
+
 function decrypt(text) {
-   let iv = Buffer.from(text.iv, 'hex');
-   let encryptedText = Buffer.from(text.encryptedData, 'hex');
-   let decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(key), iv);
-   let decrypted = decipher.update(encryptedText);
-   decrypted = Buffer.concat([decrypted, decipher.final()]);
-   return decrypted.toString();
+  console.log(text.iv)
+  let iv = Buffer.from(text.iv, 'hex');
+  let encryptedText = Buffer.from(text.encryptedData, 'hex');
+  let decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(key), iv);
+  let decrypted = decipher.update(encryptedText);
+  decrypted = Buffer.concat([decrypted, decipher.final()]);
+  return decrypted.toString();
 }
+
 
 // var hw = encrypt("Welcome to Tutorials Point...")
 // console.log(hw)
@@ -67,7 +76,6 @@ connection.connect(function(err){
   })
 
 app.get('/',(req,res)=>{
-  
     res.send("hello");
  })
   
@@ -162,24 +170,34 @@ app.get('/movie/show/:index',(req,res)=>{
 })
 
 app.post('/login',(req,res)=>{
+
   var id=req.body.id;
   var password=req.body.password;
+
   var count=0;
-  connection.query('SELECT * from customer',function(err,rows){
+  var crypt=encrypt("hello")
+  console.log("type:"+type(crypt))
+    // console.log(crypt)
+    // console.log(decrypt(crypt))
+  connection.query(`SELECT * from customer where cust_id=1000`,function(err,rows){
     if (err) throw err
-    for(var i=0;i<rows.length;i++)
-    {
-      if(rows[i].cust_id==id.value&&decrypt(rows[i].password)==password.value){
-        count=1;
-        break
-      }
-    }
-    if(count==1){
-      res.json(encrypt(password.value));
-    }
-    else{
-      res.sendStatus(401,"unauthorized")
-    }
+    rows.forEach(row => {
+      // console.log(decrypt(row.password,password))
+      // pass={ iv: iv.toString('hex'), encryptedData: encrypted.toString('hex') }
+      console.log(JSON.parse(row.password))
+      
+      // if(row.cust_id==id && password==decrypt(crypt)){
+      //   console.log("signed in")
+      //   count=1;
+      // }
+    })
+  
+    // if (count==1){
+      res.json(encrypt(password));
+    // }
+    // else{
+    //   res.send("hello")
+    // }
   })
 })
  
