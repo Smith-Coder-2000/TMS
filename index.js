@@ -1,53 +1,31 @@
-const express = require('express');
-const app = express();
+var express = require('express');
+var bodyParser = require('body-parser');
+var multer = require('multer');
+var upload = multer();
+var app = express();
 var mysql = require('mysql');
 var cors = require('cors')
 var path = require('path');
+const bcrypt = require('bcryptjs');
+
+
+app.use(bodyParser.json()); 
+app.use(bodyParser.urlencoded({ extended: true })); 
+app.use(upload.array()); 
+app.use(express.static('public'));
+
 var passwordValidator = require('password-validator');
 var schema = new passwordValidator();
-const req = require('express/lib/request');
+
 const port = 3000;
 app.use(cors())
 app.set('views', __dirname + '/views');
 app.use("/assets", express.static(path.join(__dirname, 'assets')));
 var date_obj = new Date();
-//Checking the crypto module
-const crypto = require('crypto');
-const { time } = require('console');
-const { type } = require('os');
-
-const algorithm = 'aes-256-cbc'; //Using AES encryption
-const key = crypto.randomBytes(32);
-const iv = crypto.randomBytes(16);
-
-app.use(express.json());
-app.use(express.urlencoded());
-
-//Encrypting text
-function encrypt(text) {
-   let cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(key), iv);
-   let encrypted = cipher.update(text);
-   encrypted = Buffer.concat([encrypted, cipher.final()]);
-   return { iv: iv.toString('hex'), encryptedData: encrypted.toString('hex') };
-}
 
 
-// Decrypting text
-
-function decrypt(text) {
-  console.log(text.iv)
-  let iv = Buffer.from(text.iv, 'hex');
-  let encryptedText = Buffer.from(text.encryptedData, 'hex');
-  let decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(key), iv);
-  let decrypted = decipher.update(encryptedText);
-  decrypted = Buffer.concat([decrypted, decipher.final()]);
-  return decrypted.toString();
-}
 
 
-// var hw = encrypt("Welcome to Tutorials Point...")
-// console.log(hw)
-// console.log(decrypt(hw))
 
 schema
 .is().min(8)                                    
@@ -76,45 +54,50 @@ connection.connect(function(err){
   })
 
 app.get('/',(req,res)=>{
-    res.send("hello");
+  res.sendFile(path.join(__dirname,'./test.html'));
  })
   
 
 app.post('/register',(req,res)=>{
   var name=req.body.cust_name;  
   var phn=req.body.phone_number;
-  var email=req.body.email;
+  var emails=req.body.email;
   var password=req.body.password;
   var count=0;
- 
-  if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email.value))
+ console.log(count)
+  if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(emails))
   {
-    if(schema.validate(password.value)){
+    if(schema.validate(password)){
         connection.query('SELECT email FROM customer', function (err,rows) {
           if (err) throw err
+          console.log(rows.length)
           for(var i=0;i<rows.length;i++)
           {
-            if(rows[i].email==email){
+            if(emails==rows[i].email){
               count=1;
+              console.log("hello")
+              break;
             }
           }
-        })
-        if(count=1){
+        if(count==1){
           res.send("Email id already registered");
         }
         else{
-          connection.query(`INSERT INTO customer VALUES (null,${name.value},0,${phn.value},${email.value},${encrypt(password.value)})`,function(err){
+          connection.query(`INSERT INTO customer VALUES (null,'${name}',0,${phn},'${emails}','${bcrypt.hashSync(password, 10)}')`,function(err){
             if (err) throw err
+            res.send("successfully registered");
           }) 
         }
+      })
       }
       else{
         res.send("enter strong password");
       }
-    }
+    } 
   else{
       res.send("Invalid email format");
   }
+  
 })
 
 app.get('/movies', (req, res) => {
@@ -124,7 +107,6 @@ app.get('/movies', (req, res) => {
       return;
     }
     try{
-        console.log(rows)
         res.json({rows})
         
     }catch (err) {
@@ -172,33 +154,27 @@ app.get('/movie/show/:index',(req,res)=>{
 app.post('/login',(req,res)=>{
 
   var id=req.body.id;
-  var password=req.body.password;
+  var pass=req.body.password;
 
   var count=0;
-  var crypt=encrypt("hello")
-  console.log("type:"+type(crypt))
-    // console.log(crypt)
-    // console.log(decrypt(crypt))
-  connection.query(`SELECT * from customer where cust_id=1000`,function(err,rows){
+  connection.query(`SELECT cust_id,password from customer`,function(err,rows){
     if (err) throw err
-    rows.forEach(row => {
-      // console.log(decrypt(row.password,password))
-      // pass={ iv: iv.toString('hex'), encryptedData: encrypted.toString('hex') }
-      console.log(JSON.parse(row.password))
-      
-      // if(row.cust_id==id && password==decrypt(crypt)){
-      //   console.log("signed in")
-      //   count=1;
-      // }
-    })
-  
-    // if (count==1){
-      res.json(encrypt(password));
-    // }
-    // else{
-    //   res.send("hello")
-    // }
-  })
+    for(var i=0;i<rows.length;i++)
+          {
+            var password_hash=rows[i]["password"];
+            const verified = bcrypt.compareSync(pass, password_hash.toString());
+            if(id==rows[i].cust_id && verified){
+              count=1;
+              break;
+            }
+          }
+        if(count==1){
+          res.send(bcrypt.hashSync(pass, 10))
+        }
+        else{
+          res.status(404).send('Not Found');
+        }
+})
 })
  
 app.listen(port, () => {
