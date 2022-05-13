@@ -21,7 +21,9 @@ const key = crypto.randomBytes(32);
 const iv = crypto.randomBytes(16);
 
 app.use(express.json());
-app.use(express.urlencoded());
+app.use(express.urlencoded({
+  extended:true
+}));
 
 //Encrypting text
 function encrypt(text) {
@@ -173,18 +175,18 @@ app.post('/login',(req,res)=>{
 
   var id=req.body.id;
   var password=req.body.password;
+  console.log(req.body)
 
   var count=0;
-  var crypt=encrypt("hello")
-  console.log("type:"+type(crypt))
     // console.log(crypt)
     // console.log(decrypt(crypt))
-  connection.query(`SELECT * from customer where cust_id=1000`,function(err,rows){
+  connection.query(`SELECT * from customer where cust_id=${id}`,function(err,rows){
     if (err) throw err
     rows.forEach(row => {
       // console.log(decrypt(row.password,password))
       // pass={ iv: iv.toString('hex'), encryptedData: encrypted.toString('hex') }
-      console.log(JSON.parse(row.password))
+      const pass = row.password
+      console.log(pass.encryptedData)
       
       // if(row.cust_id==id && password==decrypt(crypt)){
       //   console.log("signed in")
