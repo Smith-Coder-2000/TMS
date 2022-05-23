@@ -365,8 +365,34 @@ app.get('/seats',(req,res)=>{
 })
 
 app.get('/confirmation',(req,res)=>{
-  
+  connection.query(`SELECT A.* from ticket A where A.show_id in (SELECT B.show_id from shows B where start_time>=CURTIME() and date=CURDATE()) and status=0`,(err,rows)=>{
+    if (err) throw err
+    connection.query(`SELECT A.* from ticket A where A.show_id in (SELECT B.show_id from shows B where date>CURDATE() and status=0)`,(err,row)=>{
+      if (err) throw err
+      res.json({rows,row})  
+    })
+  })
 })
+
+app.get('/confirm',(req,res)=>{
+  if(req.query.a[1]==1){
+    connection.query(`UPDATE ticket SET status = 1 WHERE ticket_id = ${req.query.a[0]};`,(err)=>{
+      if (err) throw err
+      res.send("ticket will be mailed to you shortly")
+    })
+  }
+  else if(req.query.a[1]==0){
+    connection.query(`DELETE from ticket_details WHERE ticket_id = ${req.query.a[0]};`,(err)=>{
+      if (err) throw err
+      connection.query(`DELETE from ticket WHERE ticket_id = ${req.query.a[0]};`,(err)=>{
+        if (err) throw err
+        res.send("ticket are deleted")
+      })
+  })
+}
+})
+
+
 
 
 
