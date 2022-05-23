@@ -242,6 +242,12 @@ app.post('/assignScreen',(req,res)=>{
   }
 })
 
+app.get('/getShows',(req,res)=>{
+  connection.query(`SELECT * FROM shows`,(err,rows)=>{
+    res.json({rows})
+  })
+})
+
 app.post('/deleteShow',(req,res)=>{
   var id=req.body.show_id;
   connection.query(`SELECT * FROM shows where show_id=${id}`,(err,rows)=>{
@@ -286,7 +292,7 @@ app.get('/movie/show/:index',(req,res)=>{
   connection.query(`SELECT screen_id from shows where show_id=${index}`,function(err,rows){
     if (err) throw err
     connection.query(`SELECT * from seats where screen_id=${rows[0].screen_id}`,function(err,row){
-      connection.query(`SELECT seat_id from ticket_details where show_id=${req.query.a[0]};`,function(err,row1){
+      connection.query(`SELECT seat_id from ticket_details where show_id=${index};`,function(err,row1){
         if (err) throw err
         res.json({"seats":row,"booked":row1,"show_id":index,"screen_id":rows})
       })
@@ -358,6 +364,10 @@ app.get('/seats',(req,res)=>{
   }
 })
 
+app.get('/confirmation',(req,res)=>{
+  
+})
+
 
 
 app.get('/send',(req,res)=>{
@@ -376,7 +386,7 @@ app.get('/send',(req,res)=>{
       res.status(404).send('Not sent');
       throw err
     } else {
-      res.send("email successgully sent")
+      res.send("email successfully sent")
     }
   });
 })
