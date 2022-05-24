@@ -378,7 +378,22 @@ app.get('/confirm',(req,res)=>{
   if(req.query.a[1]==1){
     connection.query(`UPDATE ticket SET status = 1 WHERE ticket_id = ${req.query.a[0]};`,(err)=>{
       if (err) throw err
-      res.send("ticket will be mailed to you shortly")
+      mail=req.query.a[2];
+      console.log(mail)
+      var mailOptions = {
+        from: 'theatexbangalore@gmail.com@gmail.com',
+        to: `${mail}`,
+        subject: `Welcome to theatex`,
+        text:`here is your ticket\n ticket id:${req.query.a[0]}\n Just show this ticket id at the entrance\n\nEnjoy the movie\n\nEnjoy Theatex\nThank you`
+      };
+      transporter.sendMail(mailOptions, function(err, info){
+        if (err) {
+          res.status(404).send('Not sent');
+          throw err
+        } else {
+          res.send("email successfully sent")
+        }
+      });
     })
   }
   else if(req.query.a[1]==0){
@@ -393,6 +408,9 @@ app.get('/confirm',(req,res)=>{
 })
 
 
+app.get('/offers',(req,res)=>{
+  
+})
 
 
 
@@ -416,6 +434,8 @@ app.get('/send',(req,res)=>{
     }
   });
 })
+
+
  
 app.listen(port, () => {
     console.log(`Example app listening at http://localhost:${port}`)
